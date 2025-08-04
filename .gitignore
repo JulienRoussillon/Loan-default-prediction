@@ -1,7 +1,4 @@
 data/raw/
-data/raw/:
-Data Dictionary.xls
-cs-test.csv
-cs-training.csv
-sampleEntry.csv
-data/raw/
+.DS_Store
+__pycache__/
+*.pyc
