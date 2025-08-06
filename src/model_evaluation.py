@@ -30,17 +30,31 @@ def split_data(df, target_col="SeriousDlqin2yrs", val_size=0.2, test_size=0.2, r
 
 
 
-from sklearn.metrics import accuracy_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import accuracy_score, recall_score, f1_score, roc_auc_score, roc_curve
+import matplotlib.pyplot as plt
 
 def evaluate_model(model, X_val, y_val):
     model_name = model.__class__.__name__
     
     y_pred = model.predict(X_val)
+    y_scores = model.predict_proba(X_val)[:, 1]
     
     acc = accuracy_score(y_val, y_pred)
     recall1 = recall_score(y_val, y_pred, pos_label=1)
     f1 = f1_score(y_val, y_pred, pos_label=1)
-    roc_auc = roc_auc_score(y_val, y_pred)
+    roc_auc = roc_auc_score(y_val, y_scores)
+    fpr, tpr, _ = roc_curve(y_val, y_scores)   # false-pos & true-pos rates
+
+    # 3) Plot
+    plt.figure(figsize=(6, 6))
+    plt.plot(fpr, tpr, label=f"ROC curve (AUC = {roc_auc:.3f})")
+    plt.plot([0, 1], [0, 1], linestyle="--")    # diagonal = random model
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("Receiver Operating Characteristic")
+    plt.legend(loc="lower right")
+    plt.grid(True)
+    plt.show()
     
     print(f"{model_name} - Accuracy: {acc:.4f} | Recall_1: {recall1:.4f} | F1_1: {f1:.4f} | Roc_Auc: {roc_auc:.4f}")
 
@@ -50,7 +64,3 @@ def evaluate_model(model, X_val, y_val):
         'recall_1': recall1,
         'f1_class1': f1,
         'roc_auc': roc_auc}
-
-
-
-
